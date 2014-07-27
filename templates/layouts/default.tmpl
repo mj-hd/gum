@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="utf-8">
+	<title>{{ .Title }}</title>
+	{{ .LinkCSS "main.css" }}
+	{{ template "Header" . }}
+</head>
+<body>
+	<header>
+		<div>
+			<h1>{{ .Title }}</h1>
+		</div>
+	</header>
+
+	<section>
+	
+	{{ template "Content" . }}
+
+	</section>
+</body>
+</html>
