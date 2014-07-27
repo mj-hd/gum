@@ -2,7 +2,7 @@ package config
 
 import "gum/utils"
 
-const (
+var (
 	SiteTitle  string = "SiteTitle"
 	ServerPort string = "8080"
 	DBHost     string = "localhost"

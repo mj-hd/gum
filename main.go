@@ -1,4 +1,4 @@
-package main
+package gum
 
 import (
 	"net/http"
@@ -14,19 +14,22 @@ import (
 	"github.com/gorilla/context"
 )
 
-func main() {
+func init() {
 
 	utils.LogFile = config.LogFile
 	utils.DisplayLog = config.DisplayLog
 	utils.LogLevel = config.LogLevel
 
-	utils.PromulgateDebugStr(os.Stdout, "初期化を開始...")
+}
 
-	defer models.Del()
-	defer controllers.Del()
-	defer templates.Del()
-	defer plugins.Del()
+func Del() {
+  models.Del()
+  controllers.Del()
+  templates.Del()
+  plugins.Del()
+}
 
+func Start() {
 	for route := range controllers.Router.Iterator() {
 		http.HandleFunc(route.Path, route.Function)
 		utils.PromulgateDebugStr(os.Stdout, route.Path+"に関数を割当")
