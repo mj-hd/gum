@@ -50,7 +50,7 @@ func Daemonize() error {
 
 	ret, _, err = syscall.Syscall(syscall.SYS_FORK, 0, 0, 0)
 	if err != 0 {
-		return -1
+		return errors.New("デーモン化に失敗")
 	}
 	switch ret {
 	case 0:
