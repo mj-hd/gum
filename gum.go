@@ -1,8 +1,10 @@
 package gum
 
 import (
+	"errors"
 	"net/http"
 	"os"
+	"syscall"
 
 	"gum/config"
 	"gum/controllers"
@@ -23,10 +25,10 @@ func init() {
 }
 
 func Del() {
-  models.Del()
-  controllers.Del()
-  templates.Del()
-  plugins.Del()
+	models.Del()
+	controllers.Del()
+	templates.Del()
+	plugins.Del()
 }
 
 func Start() {
@@ -40,4 +42,41 @@ func Start() {
 
 	utils.PromulgateInfoStr(os.Stdout, "ポート"+config.ServerPort+"でサーバを開始...")
 	http.ListenAndServe(":"+config.ServerPort, context.ClearHandler(http.DefaultServeMux))
+}
+
+func Daemonize() error {
+	var ret uintptr
+	var err syscall.Errno
+
+	ret, _, err = syscall.Syscall(syscall.SYS_FORK, 0, 0, 0)
+	if err != 0 {
+		return -1
+	}
+	switch ret {
+	case 0:
+		break
+	default:
+		os.Exit(0)
+	}
+
+	pid, _ := syscall.Setsid()
+	if pid == -1 {
+		return errors.New("デーモン化に失敗")
+	}
+
+	os.Chdir("/")
+
+	syscall.Umask(0)
+
+	f, e := os.OpenFile("/dev/null", os.O_RDWR, 0)
+	if e == nil {
+		fd := int(f.Fd())
+		syscall.Dup2(fd, int(os.Stdin.Fd()))
+		syscall.Dup2(fd, int(os.Stdout.Fd()))
+		syscall.Dup2(fd, int(os.Stderr.Fd()))
+	}
+
+	os.Chdir(config.RootPath)
+
+	return nil
 }

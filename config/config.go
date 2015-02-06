@@ -3,6 +3,7 @@ package config
 import "gum/utils"
 
 var (
+	RootPath   string = "/path/to/root/of/this/project"
 	SiteTitle  string = "SiteTitle"
 	ServerPort string = "8080"
 	DBHost     string = "localhost"
