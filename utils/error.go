@@ -131,7 +131,7 @@ func Promulgate(w io.Writer, details ErrorDetails) {
 		w.Write([]byte(log))
 	}
 
-	file, err := os.OpenFile(LogFile, os.O_APPEND|os.O_CREATE, 0666)
+	file, err := os.OpenFile(LogFile, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0666)
 	if err != nil {
 		return
 	}
