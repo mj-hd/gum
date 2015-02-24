@@ -13,13 +13,6 @@ type Template struct {
 	Template string
 }
 
-type Member interface {
-	LinkCSS(cssFile string) template.HTML
-	EmbedImage(imgFile string, alt string) template.HTML
-	LinkJS(jsFile string) template.HTML
-	Plugin(name string) template.HTML
-}
-
 type DefaultMember struct {
 	Title      string
 	IsLoggedIn bool
@@ -33,28 +26,25 @@ func Del() {
 
 func (this *Template) Render(w io.Writer, member Member) error {
 
-	tmpl, err := template.ParseFiles(config.LayoutsPath+this.Layout, config.TemplatesPath+this.Template)
-	if err != nil {
-		return err
-	}
-
-	err = tmpl.Execute(w, member)
-	if err != nil {
-		return err
-	}
+	return template.Must(template.New(this.Layout).Funcs(map[string]interface{}{
+		"linkCSS":    linkCSS,
+		"embedImage": embedImage,
+		"linkJS":     linkJS,
+		"plugin":     plugin,
+	}).ParseFiles(config.LayoutsPath+this.Layout, config.TemplatesPath+this.Template)).Execute(w, member)
 
 	return nil
 }
 
-func (this *DefaultMember) LinkCSS(cssFile string) template.HTML {
+func linkCSS(cssFile string) template.HTML {
 	return template.HTML("<link rel='stylesheet' href='/" + config.CssPath + cssFile + "' type='text/css' />")
 }
-func (this *DefaultMember) EmbedImage(imgFile string, alt string) template.HTML {
+func embedImage(imgFile string, alt string) template.HTML {
 	return template.HTML("<img alt='" + alt + "' src='/" + config.ImgPath + imgFile + "' />")
 }
-func (this *DefaultMember) LinkJS(jsFile string) template.HTML {
+func linkJS(jsFile string) template.HTML {
 	return template.HTML("<script type='text/javascript' src='/" + config.JsPath + jsFile + "' ></script>")
 }
-func (this *DefaultMember) Plugin(name string) template.HTML {
+func plugin(name string) template.HTML {
 	return plugins.Plugins[name]()
 }
