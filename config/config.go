@@ -1,6 +1,6 @@
 package config
 
-import "gum/utils"
+import "gum/utils/log"
 
 var (
 	RootPath   string = "/path/to/root/of/this/project"
@@ -12,7 +12,7 @@ var (
 	DBUser     string = "dbuser"
 	DBPass     string = "example_passwd"
 	DisplayLog bool   = true
-	LogLevel   int    = utils.Level_Debug
+	LogLevel   int    = log.Level_Debug
 	LogFile    string = "log"
 	SessionKey string = "sample"
 )

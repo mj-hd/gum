@@ -6,7 +6,7 @@ import (
 
 	"gum/config"
 	"gum/templates"
-	"gum/utils"
+	"gum/utils/log"
 )
 
 func indexHandler(document http.ResponseWriter, request *http.Request) {
@@ -21,7 +21,7 @@ func indexHandler(document http.ResponseWriter, request *http.Request) {
 		User:  getSessionUser(request),
 	})
 	if err != nil {
-		utils.PromulgateFatal(os.Stdout, err)
+		log.Fatal(os.Stdout, err)
 		showError(document, request, "ページの表示に失敗しました。")
 		return
 	}
