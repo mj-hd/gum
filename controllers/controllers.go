@@ -23,8 +23,19 @@ func Del() {
 
 }
 
+func getSession(request *http.Request) (*sessions.Session, error) {
+	session, err := sessionStore.Get(request, config.SessionName)
+
+	if err == nil {
+		// 一週間
+		session.Options.MaxAge = 86400 * 7
+	}
+
+	return session, err
+}
+
 func getSessionUser(request *http.Request) string {
-	session, _ := sessionStore.Get(request, "user")
+	session, _ := getSession(request)
 	if session.Values["User"] == nil {
 		return "anonymous"
 	}
@@ -82,7 +93,7 @@ func (this *Routes) Key(fn *func(http.ResponseWriter, *http.Request)) string {
 }
 
 func showError(document http.ResponseWriter, request *http.Request, message string) {
-	session, _ := sessionStore.Get(request, "user")
+	session, _ := getSession(request)
 
 	session.AddFlash(message)
 	session.Save(request, document)
@@ -101,7 +112,7 @@ func flashHandler(document http.ResponseWriter, request *http.Request) {
 	tmpl.Layout = "default.tmpl"
 	tmpl.Template = "flash.tmpl"
 
-	session, _ := sessionStore.Get(request, "user")
+	session, _ := getSession(request)
 
 	var message string
 	if request.URL.Path == "/error/" {
