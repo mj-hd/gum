@@ -1,22 +1,54 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-	<meta charset="utf-8">
-	<title>{{ .Title }}</title>
-	{{ linkCSS "main.css" }}
-	{{ template "Header" . }}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <title>{{ .Title }}</title>
+    <link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="57x57" href="/static/img/apple-touch-icon-57x57.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="/static/img/apple-touch-icon-72x72.png" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/static/img/apple-touch-icon-76x76.png" />
+    <link rel="apple-touch-icon" sizes="114x114" href="/static/img/apple-touch-icon-114x114.png" />
+    <link rel="apple-touch-icon" sizes="120x120" href="/static/img/apple-touch-icon-120x120.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="/static/img/apple-touch-icon-144x144.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/static/img/apple-touch-icon-152x152.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/img/apple-touch-icon-180x180.png" />
+    {{ linkCSS "main.css" }}
+    {{ linkCSS "bootstrap.min.css" }}
+    {{ linkCSS "markdown.css" }}
+    {{  linkJS "jquery.min.js" }}
+    {{  linkJS "bootstrap.min.js" }}
+
+    {{ template "Header" . }}
 </head>
 <body>
-	<header>
-		<div>
-			<h1>{{ .Title }}</h1>
-		</div>
-	</header>
+    
+<header>
 
-	<section>
-	
-	{{ template "Content" . }}
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">{{ .Title }}</a>
+            </div>
+        </div>
+    </nav>
 
-	</section>
+</header>
+
+<section class="container">
+    {{ template "Content" . }}
+</section>
+
+<footer>
+    {{ .Title  }} 2015
+</footer>
+
 </body>
 </html>

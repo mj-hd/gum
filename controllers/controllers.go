@@ -1,26 +1,32 @@
 package controllers
 
 import (
+	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/gorilla/sessions"
 
-	"gum/config"
-	"gum/templates"
+	"../config"
+	"../templates"
+	"../utils/log"
 )
 
 var Router Routes
 var sessionStore = sessions.NewCookieStore([]byte(config.SessionKey))
 
-func init() {
+func Init() {
 
-	Router.Register("/", indexHandler)
+	apiInit()
+
+	Router.RegisterPage("/", indexHandler)
 	Router.Register("/error/", flashHandler)
 	Router.Register("/success/", flashHandler)
+	Router.RegisterApi("/api/", apiHandler)
 
 }
 func Del() {
-
+	apiDel()
 }
 
 func getSession(request *http.Request) (*sessions.Session, error) {
@@ -34,13 +40,49 @@ func getSession(request *http.Request) (*sessions.Session, error) {
 	return session, err
 }
 
-func getSessionUser(request *http.Request) string {
+func getSessionUser(request *http.Request) int {
 	session, _ := getSession(request)
 	if session.Values["User"] == nil {
-		return "anonymous"
+		return 0
 	}
 
-	return session.Values["User"].(string)
+	return session.Values["User"].(int)
+}
+
+func removeSession(document http.ResponseWriter, request *http.Request) {
+	session, err := getSession(request)
+	if err != nil {
+		return
+	}
+
+	session.Options = &sessions.Options{MaxAge: -1, Path: "/"}
+	session.Save(request, document)
+}
+
+func writeStruct(document http.ResponseWriter, s interface{}, httpStatus int) {
+
+	var err error
+
+	document.Header().Set("Content-Type", "application/json")
+	jso, err := json.Marshal(s)
+
+	if err != nil {
+
+		log.Fatal(err)
+
+		document.WriteHeader(500)
+		document.Write([]byte("{ \"Status\" : \"error\", \"Message\" : \"不明のエラーです。\" }"))
+
+		return
+	}
+
+	document.WriteHeader(httpStatus)
+	document.Write(jso)
+}
+
+type apiMember struct {
+	Status  string
+	Message string
 }
 
 type Routes struct {
@@ -67,6 +109,61 @@ func (this *Routes) Iterator() <-chan Route {
 	}()
 
 	return ret
+}
+
+func (this *Routes) RegisterPage(path string, fn func(http.ResponseWriter, *http.Request) error) {
+	this.keys = append(this.keys, path)
+	this.values = append(this.values, func(document http.ResponseWriter, request *http.Request) {
+		err := fn(document, request)
+		if err != nil {
+			log.FatalStr("ページの表示に失敗:")
+			log.Fatal(err)
+
+			showError(document, request, "ページの表示中にエラーが発生しました。管理人へ報告してください。")
+		}
+	})
+}
+
+func (this *Routes) RegisterApi(path string, fn func(http.ResponseWriter, *http.Request) (int, error)) {
+	this.keys = append(this.keys, path)
+	this.values = append(this.values, func(document http.ResponseWriter, request *http.Request) {
+		status, err := fn(document, request)
+		if err != nil {
+			log.FatalStr("APIの実行に失敗:")
+			log.Fatal(err)
+
+			writeStruct(document, apiMember{
+				Status:  "error",
+				Message: err.Error(),
+			}, status)
+
+			return
+		}
+	})
+}
+
+func (this *Routes) RegisterPostApi(path string, fn func(http.ResponseWriter, *http.Request) (int, error)) {
+	wrapper := func(document http.ResponseWriter, request *http.Request) (int, error) {
+		if request.Method != "POST" {
+			return http.StatusBadRequest, errors.New("POST以外のメソッド")
+		}
+
+		return fn(document, request)
+	}
+
+	this.RegisterApi(path, wrapper)
+}
+
+func (this *Routes) RegisterGetApi(path string, fn func(http.ResponseWriter, *http.Request) (int, error)) {
+	wrapper := func(document http.ResponseWriter, request *http.Request) (int, error) {
+		if request.Method != "GET" {
+			return http.StatusBadRequest, errors.New("GET以外のメソッド")
+		}
+
+		return fn(document, request)
+	}
+
+	this.RegisterApi(path, wrapper)
 }
 
 func (this *Routes) Register(path string, fn func(http.ResponseWriter, *http.Request)) {
@@ -126,8 +223,8 @@ func flashHandler(document http.ResponseWriter, request *http.Request) {
 
 	tmpl.Render(document, flashMember{
 		DefaultMember: &templates.DefaultMember{
-			Title: message,
-			User:  getSessionUser(request),
+			Title:  message,
+			UserID: getSessionUser(request),
 		},
 		Messages: flashes,
 		Referer:  request.Referer(),

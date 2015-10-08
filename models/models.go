@@ -1,25 +1,32 @@
 package models
 
 import (
-	"database/sql"
 	"fmt"
-	"os"
 
-  _ "github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/jinzhu/gorm"
 
-	"gum/config"
-	"gum/utils/log"
+	"../config"
+	"../utils/log"
 )
 
-var DB *sql.DB
+var DB gorm.DB
 
-func init() {
+func Init() {
 	var err error
-	DB, err = sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", config.DBUser, config.DBPass, config.DBHost, config.DBPort, config.DBName))
+
+	DB, err = gorm.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", config.DBUser, config.DBPass, config.DBHost, config.DBPort, config.DBName))
 	if err != nil {
-		log.Fatal(os.Stdout, err)
+		log.Fatal(err)
 		panic(err.Error())
 	}
+
+	if config.LogLevel == log.Level_Debug {
+		DB.LogMode(true)
+	}
+
+	// 以下にテーブルの初期化処理を書く
+	// 新しいテーブルを作成するときは、以下に初期化処理を追記する
 }
 
 func Del() {

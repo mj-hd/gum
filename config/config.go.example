@@ -1,0 +1,20 @@
+package config
+
+import "../utils/log"
+
+const (
+	RootPath               string = "/path/to/your/site"
+	SiteTitle              string = "site title"
+	SiteURL                string = "http://localhost:8080"
+	ServerPort             string = "8080"
+	DBHost                 string = "localhost"
+	DBPort                 string = "3306"
+	DBName                 string = "database_name"
+	DBUser                 string = "database_user"
+	DBPass                 string = "database_pass"
+	DisplayLog             bool   = true
+	LogLevel               int    = log.Level_Debug
+	LogFile                string = "log"
+	SessionName            string = "samplename"
+	SessionKey             string = "sessionkey"
+)

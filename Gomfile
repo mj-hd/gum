@@ -1,0 +1,8 @@
+gom "github.com/go-sql-driver/mysql", :commit => "fb7299726d2e68745a8805b14f2ff44b5c2cfa84"
+gom "github.com/gorilla/context", :commit => "215affda49addc4c8ef7e2534915df2c8c35c6cd"
+gom "github.com/gorilla/sessions", :commit => "f61c3ec2cf65d69e7efedfd4d060fe128882c951"
+gom "github.com/microcosm-cc/bluemonday", :commit => "cb3660f44463dfacda51a0bfdd6b7524c22e2ecb"
+gom "github.com/russross/blackfriday", :commit => "386ef80f18233ea97960e855a54382ec446c6637"
+gom "github.com/jinzhu/gorm", :commit => "d35a44c5b123c3a44c95beeff5d0f1f8bce6ed3b"
+gom "github.com/gholt/blackfridaytext", :commit => "291d21f0fb462eb1caa99fd126a5aa4c496b6e6d"
+

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="utf-8">
+	<title>{{ .Title }}</title>
+	{{ linkCSS "main.css" }}
+	{{ linkCSS "bootstrap.min.css" }}
+	{{  linkJS "jquery.min.js" }}
+	{{  linkJS "bootstrap.min.js" }}
+
+	{{ template "Header" . }}
+</head>
+<body>
+
+	{{ template "Content" . }}
+
+</body>
